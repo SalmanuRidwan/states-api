@@ -4,6 +4,7 @@ from flask_cors import CORS
 
 STATES_PER_PAGE = 10
 
+
 def paginate_states(request, selection):
     page = request.args.get("page", 1, type=int)
     start = (page - 1) * STATES_PER_PAGE
@@ -19,13 +20,17 @@ def create_app(test_conf=None):
     app = Flask(__name__)
     setup_db(app)
     CORS(app)
-    
+
     @app.after_request
     def after_request(response):
-        response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-        response.headers.add('Acceess-Contrll-Allow-Methods', 'GET, POST, DELETE, PUT, OPTIONS')
+        response.headers.add(
+            'Access-Control-Allow-Headers',
+            'Content-Type, Authorization')
+        response.headers.add(
+            'Acceess-Contrll-Allow-Methods',
+            'GET, POST, DELETE, PUT, OPTIONS')
         return response
-    
+
     @app.route('/states')
     def get_states():
         selection = State.query.order_by(State.id).all()
@@ -39,7 +44,7 @@ def create_app(test_conf=None):
                 'states': current_states,
                 'total_states': len(State.query.all())
             })
-        
+
     @app.route('/states', methods=['POST'])
     def create_state():
         body = request.get_json()
@@ -48,8 +53,11 @@ def create_app(test_conf=None):
             new_governor = body.get('governor', None)
             new_name = body.get('name', None)
             new_capital = body.get('capital', None)
-            
-            state = State(name=new_name, capital=new_capital, governor=new_governor)
+
+            state = State(
+                name=new_name,
+                capital=new_capital,
+                governor=new_governor)
             state.insert()
 
             selection = State.query.order_by(State.id).all()
@@ -62,10 +70,9 @@ def create_app(test_conf=None):
                 'total_states': len(State.query.all())
             })
 
-        except:
+        except BaseException:
             abort(422)
 
-        
     @app.route('/states/<int:state_id>')
     def get_specific_state(state_id):
         state = State.query.filter(State.id == state_id).one_or_none()
@@ -76,7 +83,7 @@ def create_app(test_conf=None):
             })
         else:
             abort(404)
-            
+
     @app.route('/states/<int:state_id>', methods=['DELETE'])
     def delete_state(state_id):
         try:
@@ -97,7 +104,6 @@ def create_app(test_conf=None):
         except BaseException:
             abort(404)
 
-            
     @app.route('/states/<int:state_id>', methods=['PATCH'])
     def update_state(state_id):
         body = request.get_json()
@@ -115,10 +121,9 @@ def create_app(test_conf=None):
                     'success': True,
                     'id': state.id
                 })
-        except:
+        except BaseException:
             abort(400)
 
-    
     @app.errorhandler(404)
     def not_found(error):
         return jsonify({
@@ -143,5 +148,4 @@ def create_app(test_conf=None):
             'message': "bad request"
         }), 400
 
-        
     return app
