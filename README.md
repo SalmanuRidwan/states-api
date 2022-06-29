@@ -83,7 +83,7 @@ Navigate to project homepage [http://127.0.0.1:5000/](http://127.0.0.1:5000/) or
   - Returns the succes value, id of state created, all the states avalable as well as the total number of states
   - URI: `curl http://localhost:5000/states -X POST -H "Content-Type: application/json" -d '{"name": "Cross-river", "capital": "Calabar", "governor": "Amechi"}'`
   - Response:
-  ```
+```
     {
   "created": 4, 
   "states": [
@@ -115,7 +115,7 @@ Navigate to project homepage [http://127.0.0.1:5000/](http://127.0.0.1:5000/) or
   "success": true, 
   "total_states": 4
 }
-  ```
+```
 
 - GET `/states/3`
   - Returns a specific question based on the id provided. On this case 3
@@ -138,15 +138,21 @@ Navigate to project homepage [http://127.0.0.1:5000/](http://127.0.0.1:5000/) or
   - Deletes a specific state based on the id provided
   - Returns success value, id of state deleted, available states and total number of the available states
   - URI: `curl http://localhost:5000/states/4 -X DELETE -H "Content-Type: application/json"`
+  
+```
+    'deleted': 4,
+    'success': True,
+    'total_states: 3
+```
 
 - PATCH `/states/10`
   - Update the governor of a state
   - Returns success value and the id of state updated
   - URI: `curl -X PATCH http://localhost:5000/states/10 -H "Content-Type: application/json" -d '{"governor": "Lawal Yahaya"}'`
   - Response:
-  ```
+```
     {
         "id": 10, 
         "success": true
     }
-  ```
+```
