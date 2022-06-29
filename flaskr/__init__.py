@@ -4,7 +4,6 @@ from flask_cors import CORS
 
 STATES_PER_PAGE = 10
 
-
 def paginate_states(request, selection):
     page = request.args.get("page", 1, type=int)
     start = (page - 1) * STATES_PER_PAGE
@@ -34,12 +33,12 @@ def create_app(test_conf=None):
 
         if len(current_states) == 0:
             abort(404)
-
-        return jsonify({
-            'success': True,
-            'states': current_states,
-            'total_states': len(State.query.all())
-        })
+        else:
+            return jsonify({
+                'success': True,
+                'states': current_states,
+                'total_states': len(State.query.all())
+            })
         
     @app.route('/states', methods=['POST'])
     def create_state():
@@ -70,15 +69,13 @@ def create_app(test_conf=None):
     @app.route('/states/<int:state_id>')
     def get_specific_state(state_id):
         state = State.query.filter(State.id == state_id).one_or_none()
-        
-        if state is None:
-            abort(404)
-            
-        else:
+        if state:
             return jsonify({
                 'success': True,
                 'state': state.format()
             })
+        else:
+            abort(404)
             
     @app.route('/states/<int:state_id>', methods=['DELETE'])
     def delete_state(state_id):
@@ -97,11 +94,8 @@ def create_app(test_conf=None):
                     'states': current_states,
                     'total_states': len(total_states)
                 })
-                
-            else:
-                abort(404)
-        except:
-            abort(422)
+        except BaseException:
+            abort(404)
 
             
     @app.route('/states/<int:state_id>', methods=['PATCH'])
@@ -148,14 +142,6 @@ def create_app(test_conf=None):
             'error': 400,
             'message': "bad request"
         }), 400
-
-    @app.errorhandler(405)
-    def not_found(error):
-        jsonify({
-            'success': False,
-            'error': 405,
-            'message': "method not allowed"
-        }), 405
 
         
     return app
