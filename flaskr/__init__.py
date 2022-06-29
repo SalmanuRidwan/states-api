@@ -45,11 +45,11 @@ def create_app(test_conf=None):
     def create_state():
         body = request.get_json()
 
-        new_name = body.get('name', None)
-        new_capital = body.get('capital', None)
-        new_governor = body.get('governor', None)
-
         try:
+            new_governor = body.get('governor', None)
+            new_name = body.get('name', None)
+            new_capital = body.get('capital', None)
+            
             state = State(name=new_name, capital=new_capital, governor=new_governor)
             state.insert()
 
@@ -81,31 +81,31 @@ def create_app(test_conf=None):
             })
             
     @app.route('/states/<int:state_id>', methods=['DELETE'])
-    def delete_book(state_id):
+    def delete_state(state_id):
         try:
             state = State.query.filter(State.id == state_id).one_or_none()
 
-            if state is None:
+            if state:
+                state.delete()
+                selection = State.query.order_by(State.id).all()
+                current_states = paginate_states(request, selection)
+                total_states = State.query.all()
+
+                return jsonify({
+                    'success': True,
+                    'deleted': state_id,
+                    'states': current_states,
+                    'total_states': len(total_states)
+                })
+                
+            else:
                 abort(404)
-
-            state.delete()
-            selection = State.query.order_by(State.id).all()
-            current_states = paginate_states(request, selection)
-            total_states = State.query.all()
-
-            return jsonify({
-                'success': True,
-                'deleted': state_id,
-                'states': current_states,
-                'total_states': len(total_states)
-            })
-
         except:
             abort(422)
 
             
     @app.route('/states/<int:state_id>', methods=['PATCH'])
-    def update_book(state_id):
+    def update_state(state_id):
         body = request.get_json()
 
         try:
@@ -115,13 +115,12 @@ def create_app(test_conf=None):
 
             if 'governor' in body:
                 state.governor = body['governor']
+                state.update()
 
-            state.update()
-
-            return jsonify({
-                'success': True,
-                'id': state.id
-            })
+                return jsonify({
+                    'success': True,
+                    'id': state.id
+                })
         except:
             abort(400)
 
