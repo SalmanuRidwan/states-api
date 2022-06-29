@@ -111,7 +111,7 @@ def create_app(test_conf=None):
         try:
             state = State.query.filter(State.id == state_id).one_or_none()
             if state is None:
-                abort(404)
+                abort(400)
 
             if 'governor' in body:
                 state.governor = body['governor']
